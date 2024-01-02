@@ -43,9 +43,20 @@ class User:
 
 
 def generate_unique_id(first_name, last_name):
-    unique_string = str(uuid.uuid4().hex)
-    generated_id = f"{first_name.lower()[:3]}{last_name.lower()[:3]}{
-        unique_string}"
+    first_name = first_name.lower()
+    last_name = last_name.lower()
+
+    first_3 = first_name[:3]
+    last_3 = last_name[:3]
+
+    if len(first_3) < 3:
+        first_3 = first_3.ljust(3, 'x')
+    if len(last_3) < 3:
+        last_3 = last_3.ljust(3, 'x')
+
+    unique_string = str(uuid.uuid4().hex)[:8]
+    generated_id = f"{first_3}{last_3}{unique_string}"
+
     return generated_id
 
 
