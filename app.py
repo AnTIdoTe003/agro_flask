@@ -128,7 +128,7 @@ def get_users():
 
 @app.route('/create-users', methods=['POST'])
 def add_user():
-    if not all(field in request.json for field in ['first_name', 'last_name', 'email', 'phone', 'password', 'land']):
+    if not all(field in request.json for field in ['first_name', 'last_name', 'email', 'phone', 'password']):
         return jsonify({'message': 'Fields are missing'}), 404
 
     generated_id = generate_unique_id(
