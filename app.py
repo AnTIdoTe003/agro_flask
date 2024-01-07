@@ -7,7 +7,7 @@ from flask_mail import Mail, Message
 import uuid
 from twilio.rest import Client
 from dotenv import load_dotenv
-
+import urllib.request
 load_dotenv()
 
 
@@ -22,7 +22,7 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_USE_SSL'] = True
 app.config['TWILIO_ACCOUNT_SID'] = os.getenv('TWILIO_ACCOUNT_SID')
 app.config['TWILIO_AUTH_TOKEN'] = os.getenv('TWILIO_AUTH_TOKEN')
-
+app.config['ESP_URL'] = os.getenv('ESP_URL')
 mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -224,6 +224,15 @@ def delete_user(user_id):
         return jsonify({'message': 'User deleted successfully'})
     else:
         return jsonify({'message': 'User not found'}), 404
+
+
+@app.route('/get-sensor-data', methods=['GET'])
+def get_sensor_data():
+    global sensor_data
+    n = urllib.request.urlopen(app.config['ESP_URL']).read()
+    n = n.decode("utf-8")
+    sensor_data = n.split()
+    return jsonify({"data": "Moisture Value: {}".format(sensor_data[0])}), 200
 
 
 @app.route('/protected', methods=['GET'])
