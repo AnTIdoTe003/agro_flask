@@ -8,10 +8,12 @@ import uuid
 from twilio.rest import Client
 from dotenv import load_dotenv
 import urllib.request
+from flask_cors import CORS
 load_dotenv()
 
 
 app = Flask(__name__)
+CORS(app)
 app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
@@ -233,6 +235,25 @@ def get_sensor_data():
     n = n.decode("utf-8")
     sensor_data = n.split()
     return jsonify({"data": "Moisture Value: {}".format(sensor_data[0])}), 200
+
+
+@app.route('/start-motor', methods=['POST'])
+def start_motor():
+    pump_control = request.json['pump_control']
+    print(pump_control)
+    if pump_control == "YES":
+        urllib.request.urlopen(app.config['ESP_URL'] + "control?value=1")
+        print("Pump turned ON.")
+    elif pump_control == "NO":
+        urllib.request.urlopen(app.config['ESP_URL'] + "control?value=0")
+        print("Pump turned OFF.")
+    else:
+        print("Invalid input. Please enterYESorNO.")
+
+    return jsonify({
+        "success": True,
+        "message": "Motor activated successfully"
+    })
 
 
 @app.route('/protected', methods=['GET'])
